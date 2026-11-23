@@ -1,0 +1,95 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id              String           @id @default(cuid())
+  phone           String           @unique
+  email           String?
+  passwordHash    String
+  role            String           @default("LABOURER") // FARMER, LABOURER, ADMIN
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  farmerProfile   FarmerProfile?
+  labourerProfile LabourerProfile?
+}
+
+model FarmerProfile {
+  id           String    @id @default(cuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName     String
+  farmName     String?
+  district     String
+  taluka       String?
+  village      String?
+  primaryCrops String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  jobPosts     JobPost[]
+}
+
+model LabourerProfile {
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName        String
+  skills          String           // Comma-separated or JSON: "Harvesting, Weeding, Spraying"
+  experienceYears Int              @default(0)
+  isCrewLeader    Boolean          @default(false)
+  crewSize        Int              @default(1)
+  district        String
+  taluka          String?
+  village         String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  applications    JobApplication[]
+}
+
+model JobPost {
+  id              String           @id @default(cuid())
+  farmerId        String
+  farmer          FarmerProfile    @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  title           String
+  cropType        String
+  activity        String           // SOWING, WEEDING, SPRAYING, HARVESTING, PACKAGING, GENERAL
+  workersNeeded   Int
+  dailyWage       Int
+  wageType        String           @default("PER_DAY") // PER_DAY, PER_ACRE, PER_BAG
+  startDate       DateTime
+  endDate         DateTime
+  state           String           @default("Maharashtra")
+  district        String
+  taluka          String?
+  village         String?
+  additionalPerks String?
+  status          String           @default("OPEN") // OPEN, FILLED, COMPLETED, CANCELLED
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  applications    JobApplication[]
+
+  @@index([status, district, activity])
+  @@index([farmerId])
+}
+
+model JobApplication {
+  id             String          @id @default(cuid())
+  jobPostId      String
+  jobPost        JobPost         @relation(fields: [jobPostId], references: [id], onDelete: Cascade)
+  labourerId     String
+  labourer       LabourerProfile @relation(fields: [labourerId], references: [id], onDelete: Cascade)
+  workersOffered Int             @default(1)
+  applicantNote  String?
+  status         String          @default("PENDING") // PENDING, ACCEPTED, REJECTED, WITHDRAWN
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@unique([jobPostId, labourerId])
+  @@index([jobPostId])
+  @@index([labourerId])
+}

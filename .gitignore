@@ -1,0 +1,38 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing & Coverage
+/coverage
+
+# Next.js build
+/.next/
+/out/
+/build
+
+# Environment files
+.env
+.env*.local
+!.env.example
+
+# IDE & OS
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.idea/
+.vscode/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Prisma / SQLite local files
+*.db
+*.sqlite
+dev.db
