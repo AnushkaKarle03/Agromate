@@ -39,6 +39,40 @@ export function useAuth() {
     }
   }, []);
 
+  const switchRole = async (newRole: 'FARMER' | 'LABOURER' | 'MACHINE_OWNER') => {
+    try {
+      const res = await fetch('/api/auth/switch-role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${state.token}`,
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        const updatedUser = {
+          ...state.user,
+          activeRole: newRole,
+          currentProfile: data.user?.currentProfile,
+        };
+        localStorage.setItem('agromate_user', JSON.stringify(updatedUser));
+        localStorage.setItem('agromate_token', data.token);
+        setState((prev) => ({ ...prev, user: updatedUser, token: data.token }));
+
+        if (newRole === 'FARMER') {
+          router.push('/farmer/dashboard');
+        } else if (newRole === 'LABOURER') {
+          router.push('/labourer/feed');
+        } else {
+          router.push('/machinery/hub');
+        }
+      }
+    } catch (err) {
+      console.error('Role switch failed', err);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('agromate_token');
     localStorage.removeItem('agromate_user');
@@ -47,5 +81,5 @@ export function useAuth() {
     router.push('/auth/login');
   };
 
-  return { ...state, logout };
+  return { ...state, switchRole, logout };
 }

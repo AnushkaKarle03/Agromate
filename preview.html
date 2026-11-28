@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agromate — Agricultural Labour & Machinery Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .fade-in { animation: fadeIn 0.25s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Header & Navigation -->
+  <header class="sticky top-0 z-50 bg-green-700 text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="showTab('home')">
+        <span class="text-2xl">🌱</span>
+        <span class="font-bold text-xl tracking-tight">Agromate</span>
+      </div>
+
+      <!-- Center: Prominent Role Mode Switcher -->
+      <div class="hidden sm:flex items-center space-x-1 bg-green-900/60 p-1 rounded-xl text-xs">
+        <button onclick="switchRole('farmer')" id="header-btn-farmer" class="px-2.5 py-1 rounded-lg font-semibold bg-white text-green-900 shadow-xs transition">
+          🚜 Farmer Mode
+        </button>
+        <button onclick="switchRole('labourer')" id="header-btn-labourer" class="px-2.5 py-1 rounded-lg font-semibold text-green-100 hover:text-white transition">
+          🌾 Labourer Mode
+        </button>
+        <button onclick="switchRole('machinery')" id="header-btn-machinery" class="px-2.5 py-1 rounded-lg font-semibold text-green-100 hover:text-white transition">
+          ⚙️ Machinery Mode
+        </button>
+      </div>
+
+      <!-- Right: Dynamic Actions based on Role -->
+      <nav class="flex items-center space-x-2 text-xs sm:text-sm font-medium">
+        <button onclick="showTab('home')" class="px-2 py-1 rounded hover:text-green-200">Home</button>
+        <span id="role-nav-action">
+          <button onclick="showTab('post-job')" class="bg-green-800 hover:bg-green-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs">+ Post Job</button>
+        </span>
+      </nav>
+    </div>
+
+    <!-- Mobile Role Switcher Bar -->
+    <div class="sm:hidden bg-green-800/90 px-3 py-1.5 flex justify-between items-center text-xs border-t border-green-600">
+      <span class="text-green-200 text-[11px] font-semibold">Active Role:</span>
+      <div class="flex space-x-1">
+        <button onclick="switchRole('farmer')" id="m-btn-farmer" class="px-2 py-0.5 rounded text-[11px] font-bold bg-white text-green-900">🚜 Farmer</button>
+        <button onclick="switchRole('labourer')" id="m-btn-labourer" class="px-2 py-0.5 rounded text-[11px] font-bold text-green-100">🌾 Labourer</button>
+        <button onclick="switchRole('machinery')" id="m-btn-machinery" class="px-2 py-0.5 rounded text-[11px] font-bold text-green-100">⚙️ Machinery</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Live Multi-Role User Context Banner -->
+  <div class="bg-slate-900 text-white px-4 py-2 text-xs border-b border-slate-800 shadow-xs">
+    <div class="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="bg-green-600 text-white font-bold px-2 py-0.5 rounded text-[10px] uppercase tracking-wider">Unified Account</span>
+        <span id="role-indicator">User: <b>Anand Shinde</b> • Current Mode: <span class="text-green-400 font-bold">🚜 Farmer (Job Poster)</span></span>
+      </div>
+      <div class="flex items-center space-x-2 text-[11px] text-slate-300">
+        <span>🔄 One Single Login — Switch roles anytime above!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-5xl w-full mx-auto p-4 pb-16">
+
+    <!-- TAB 1: HOME / LANDING -->
+    <section id="tab-home" class="space-y-6 py-2 fade-in">
+      <div class="text-center py-10 bg-gradient-to-b from-green-50 to-white rounded-3xl p-6 border border-green-100 shadow-xs">
+        <span class="inline-block px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full mb-3">
+          🌾 Single Account for Farm Labour, Work & Machinery
+        </span>
+        <h1 class="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+          One Agricultural Platform <br />
+          <span class="text-green-700">Farmer • Labourer • Machine Owner</span>
+        </h1>
+        <p class="mt-3 text-xs sm:text-sm text-slate-600 max-w-xl mx-auto">
+          In rural India, a farmer also works as a labourer, and a machine owner also farms. You don't need separate accounts: log in once, and switch your active role instantly.
+        </p>
+
+        <div class="mt-6 flex flex-wrap gap-2.5 justify-center text-xs sm:text-sm font-semibold">
+          <button onclick="switchRole('farmer')" class="px-5 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl shadow transition">
+            🚜 Switch to Farmer Mode
+          </button>
+          <button onclick="switchRole('labourer')" class="px-5 py-2.5 bg-white hover:bg-slate-50 text-green-800 border-2 border-green-600 rounded-xl transition">
+            🌾 Switch to Labourer Mode
+          </button>
+          <button onclick="switchRole('machinery')" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow transition">
+            ⚙️ Switch to Machinery Mode
+          </button>
+        </div>
+      </div>
+
+      <!-- 3 Integrated Pillars -->
+      <div class="grid sm:grid-cols-3 gap-4 pt-2">
+        <!-- Pillar 1 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-green-400 transition flex flex-col justify-between">
+          <div>
+            <div class="text-3xl mb-2">🚜</div>
+            <h2 class="text-base font-bold text-slate-900">Farmer Mode</h2>
+            <p class="text-xs text-slate-600 mt-1 mb-3">Post labour requirements for harvesting, sowing, or weeding. Review incoming applications.</p>
+            <ul class="text-xs text-slate-700 space-y-1 mb-4">
+              <li>✓ Set daily wage (₹/day) & worker count</li>
+              <li>✓ Review applicant experience & crew size</li>
+              <li>✓ Direct Call & WhatsApp contacts</li>
+            </ul>
+          </div>
+          <button onclick="switchRole('farmer')" class="w-full text-center text-xs font-semibold bg-green-100 text-green-800 py-2 rounded-xl hover:bg-green-200">
+            Activate Farmer Mode →
+          </button>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-green-400 transition flex flex-col justify-between">
+          <div>
+            <div class="text-3xl mb-2">🧑‍🌾</div>
+            <h2 class="text-base font-bold text-slate-900">Labourer Mode</h2>
+            <p class="text-xs text-slate-600 mt-1 mb-3">Browse open farm jobs nearby. Apply with one tap without paying contractor cuts.</p>
+            <ul class="text-xs text-slate-700 space-y-1 mb-4">
+              <li>✓ Transparent daily wage figures</li>
+              <li>✓ Filter by district and task</li>
+              <li>✓ 1-Tap application & call employer</li>
+            </ul>
+          </div>
+          <button onclick="switchRole('labourer')" class="w-full text-center text-xs font-semibold bg-green-100 text-green-800 py-2 rounded-xl hover:bg-green-200">
+            Activate Labourer Mode →
+          </button>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-amber-400 transition flex flex-col justify-between">
+          <div>
+            <div class="text-3xl mb-2">⚙️</div>
+            <h2 class="text-base font-bold text-slate-900">Machine Owner Mode</h2>
+            <p class="text-xs text-slate-600 mt-1 mb-3">Rent your tractor, harvester, or drone sprayer to nearby farms during seasonal rush.</p>
+            <ul class="text-xs text-slate-700 space-y-1 mb-4">
+              <li>✓ Set hourly (₹/hr) & per-acre rates</li>
+              <li>✓ List rotavators, sprayers & plows</li>
+              <li>✓ Receive direct farmer booking calls</li>
+            </ul>
+          </div>
+          <button onclick="switchRole('machinery')" class="w-full text-center text-xs font-semibold bg-amber-100 text-amber-900 py-2 rounded-xl hover:bg-amber-200">
+            Activate Machinery Mode →
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: FARMER DASHBOARD -->
+    <section id="tab-farmer-dash" class="hidden space-y-4 fade-in">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded">FARMER MODE</span>
+            <h2 class="text-xl font-bold text-slate-900">Farmer Management Dashboard</h2>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Manage your posted labour requirements & review incoming worker applications</p>
+        </div>
+        <button onclick="showTab('post-job')" class="px-3.5 py-2 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-semibold shadow transition">
+          + Post New Requirement
+        </button>
+      </div>
+
+      <!-- Dashboard Postings List -->
+      <div id="farmer-jobs-list" class="space-y-3">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- TAB 3: POST NEW JOB FORM -->
+    <section id="tab-post-job" class="hidden max-w-xl mx-auto bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4 fade-in">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900">Post Farm Labour Requirement</h2>
+        <p class="text-xs text-slate-500">Publish your opening for nearby workers to discover</p>
+      </div>
+
+      <form onsubmit="handleNewJob(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Job Title</label>
+          <input id="post-title" type="text" required placeholder="e.g. Urgent Wheat Harvesters for 4 Days" class="w-full px-3 py-2 border rounded-xl text-xs" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Crop Type</label>
+            <input id="post-crop" type="text" required placeholder="e.g. Wheat, Sugarcane" class="w-full px-3 py-1.5 border rounded-xl text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">District</label>
+            <select id="post-district" class="w-full px-3 py-1.5 border rounded-xl text-xs bg-white">
+              <option value="Pune">Pune</option>
+              <option value="Nashik">Nashik</option>
+              <option value="Ahmednagar">Ahmednagar</option>
+              <option value="Solapur">Solapur</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Task Category</label>
+          <select id="post-activity" class="w-full px-3 py-1.5 border rounded-xl text-xs bg-white">
+            <option value="HARVESTING">🌾 Harvesting</option>
+            <option value="WEEDING">🌿 Weeding</option>
+            <option value="SPRAYING">🧪 Spraying</option>
+            <option value="SOWING">🌱 Sowing & Planting</option>
+            <option value="GENERAL">🚜 General Farm Work</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Workers Needed</label>
+            <input id="post-workers" type="number" min="1" value="5" required class="w-full px-3 py-1.5 border rounded-xl text-xs" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Daily Wage (₹ / Day)</label>
+            <input id="post-wage" type="number" min="100" step="50" value="650" required class="w-full px-3 py-1.5 border rounded-xl text-xs" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Perks / Working Hours</label>
+          <input id="post-perks" type="text" placeholder="e.g. Morning tea, snacks and water provided" class="w-full px-3 py-1.5 border rounded-xl text-xs" />
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-green-700 hover:bg-green-800 text-white font-semibold rounded-xl text-xs shadow transition">
+          Publish Labour Requirement
+        </button>
+      </form>
+    </section>
+
+    <!-- TAB 4: APPLICANTS REVIEW -->
+    <section id="tab-applicants" class="hidden space-y-4 fade-in">
+      <div class="flex justify-between items-center">
+        <div>
+          <button onclick="showTab('farmer-dash')" class="text-xs text-green-700 hover:underline">← Back to Dashboard</button>
+          <h2 class="text-lg font-bold text-slate-900 mt-1">Review Applicants: <span id="app-job-title" class="text-green-700">Sugarcane Harvesting</span></h2>
+          <p class="text-xs text-slate-500">Contact details remain privacy-masked until you accept the worker</p>
+        </div>
+      </div>
+
+      <div id="applicants-list" class="space-y-3">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- TAB 5: LABOURER JOB FEED -->
+    <section id="tab-feed" class="hidden space-y-4 fade-in">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded">LABOURER MODE</span>
+            <h2 class="text-xl font-bold text-slate-900">Available Farm Work Opportunities</h2>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">Live listings posted directly by farmers across Maharashtra</p>
+        </div>
+        <button onclick="showTab('my-applications')" class="px-3 py-1.5 bg-green-100 text-green-800 rounded-xl text-xs font-semibold hover:bg-green-200 transition">
+          My Applied Jobs →
+        </button>
+      </div>
+
+      <!-- Filter Controls -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex flex-wrap gap-2 items-center text-xs">
+        <span class="font-bold text-slate-700">Filter By:</span>
+        <select id="feed-district" onchange="renderJobs()" class="px-2.5 py-1.5 border rounded-lg bg-slate-50 text-xs">
+          <option value="">All Maharashtra Districts</option>
+          <option value="Pune">Pune</option>
+          <option value="Nashik">Nashik</option>
+          <option value="Ahmednagar">Ahmednagar</option>
+          <option value="Solapur">Solapur</option>
+        </select>
+        <select id="feed-activity" onchange="renderJobs()" class="px-2.5 py-1.5 border rounded-lg bg-slate-50 text-xs">
+          <option value="">All Tasks</option>
+          <option value="HARVESTING">🌾 Harvesting</option>
+          <option value="WEEDING">🌿 Weeding</option>
+          <option value="SPRAYING">🧪 Spraying</option>
+          <option value="SOWING">🌱 Sowing & Planting</option>
+        </select>
+      </div>
+
+      <!-- Job List -->
+      <div id="job-feed-list" class="space-y-3">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- TAB 6: LABOURER MY APPLICATIONS -->
+    <section id="tab-my-applications" class="hidden space-y-4 fade-in">
+      <div class="flex justify-between items-center">
+        <div>
+          <button onclick="showTab('feed')" class="text-xs text-green-700 hover:underline">← Back to Job Feed</button>
+          <h2 class="text-lg font-bold text-slate-900 mt-1">My Applied Jobs</h2>
+          <p class="text-xs text-slate-500">Track application status and call farmers directly upon approval</p>
+        </div>
+      </div>
+
+      <div id="my-apps-list" class="space-y-3">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </section>
+
+    <!-- TAB 7: MACHINERY HUB (NEW: FOR MACHINE OWNERS & FARMERS) -->
+    <section id="tab-machinery" class="hidden space-y-4 fade-in">
+      <div class="bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-3xl p-6 shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="text-xs bg-amber-900 text-amber-200 font-bold px-2 py-0.5 rounded uppercase tracking-wider">MACHINE OWNER MODE</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-extrabold mt-1">Agricultural Machinery & Equipment Hub</h2>
+          <p class="text-xs sm:text-sm text-amber-100 mt-0.5">Rent or offer tractors, harvesters, drone sprayers & rotavators with transparent hourly/acre rates</p>
+        </div>
+        <button onclick="openAddMachineModal()" class="px-4 py-2 bg-white text-amber-900 font-bold rounded-xl text-xs shadow hover:bg-amber-50 transition whitespace-nowrap">
+          + List Your Machine
+        </button>
+      </div>
+
+      <!-- Machinery Filter -->
+      <div class="bg-white p-3.5 rounded-2xl border border-slate-200 flex flex-wrap gap-2 items-center text-xs">
+        <span class="font-bold text-slate-700">Filter Machinery:</span>
+        <select id="machinery-district" onchange="renderMachinery()" class="px-2.5 py-1.5 border rounded-lg bg-slate-50 text-xs">
+          <option value="">All Districts</option>
+          <option value="Pune">Pune</option>
+          <option value="Nashik">Nashik</option>
+          <option value="Ahmednagar">Ahmednagar</option>
+          <option value="Solapur">Solapur</option>
+        </select>
+        <select id="machinery-type" onchange="renderMachinery()" class="px-2.5 py-1.5 border rounded-lg bg-slate-50 text-xs">
+          <option value="">All Equipment</option>
+          <option value="TRACTOR">🚜 Tractor & Ploughs</option>
+          <option value="HARVESTER">🌾 Harvester</option>
+          <option value="SPRAYER">🧪 Drone Sprayer</option>
+        </select>
+      </div>
+
+      <!-- Machinery Grid -->
+      <div id="machinery-list" class="grid sm:grid-cols-2 gap-4">
+        <!-- Rendered by JavaScript -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive JavaScript State Store & Multi-Role Router -->
+  <script>
+    // State Store
+    let activeRole = 'farmer'; // 'farmer' | 'labourer' | 'machinery'
+
+    const jobs = [
+      {
+        id: 'job-1',
+        title: 'Sugarcane Harvest Crew Needed (12 Workers)',
+        crop: 'Sugarcane',
+        activity: 'HARVESTING',
+        workersNeeded: 12,
+        wage: 700,
+        district: 'Pune',
+        village: 'Baramati',
+        farmerName: 'Anand Shinde',
+        farmerPhone: '9822001122',
+        perks: 'Morning tea & snacks provided',
+        status: 'OPEN'
+      },
+      {
+        id: 'job-2',
+        title: 'Grape Pruning & Canopy Management',
+        crop: 'Grapes',
+        activity: 'SPRAYING',
+        workersNeeded: 6,
+        wage: 650,
+        district: 'Nashik',
+        village: 'Dindori',
+        farmerName: 'Balasaheb Vikhe',
+        farmerPhone: '9844556677',
+        perks: 'Safety equipment provided',
+        status: 'OPEN'
+      },
+      {
+        id: 'job-3',
+        title: 'Onion Sowing & Field Preparation',
+        crop: 'Onion',
+        activity: 'SOWING',
+        workersNeeded: 8,
+        wage: 550,
+        district: 'Ahmednagar',
+        village: 'Rahata',
+        farmerName: 'Sunil Jagtap',
+        farmerPhone: '9877112233',
+        perks: 'Transport from main road arranged',
+        status: 'OPEN'
+      }
+    ];
+
+    const machinery = [
+      {
+        id: 'm-1',
+        title: 'Mahindra 575 DI (45 HP) with 42-Blade Rotavator',
+        type: 'TRACTOR',
+        ownerName: 'Anand Shinde (You)',
+        phone: '9822001122',
+        district: 'Pune',
+        village: 'Baramati',
+        ratePerHour: 800,
+        ratePerAcre: 1400,
+        specs: 'Experienced driver included, best for deep rotavation & seedbed prep'
+      },
+      {
+        id: 'm-2',
+        title: 'Claas Crop Tiger 30 Combine Harvester',
+        type: 'HARVESTER',
+        ownerName: 'Santosh Gaikwad',
+        phone: '9833445566',
+        district: 'Nashik',
+        village: 'Niphad',
+        ratePerHour: 1800,
+        ratePerAcre: 2400,
+        specs: 'High capacity wheat, soybean & gram harvesting with zero spillage'
+      },
+      {
+        id: 'm-3',
+        title: 'Agricultural 16L Drone Sprayer (GPS RTK)',
+        type: 'SPRAYER',
+        ownerName: 'Ganesh More',
+        phone: '9877889900',
+        district: 'Ahmednagar',
+        village: 'Rahata',
+        ratePerHour: 600,
+        ratePerAcre: 450,
+        specs: '1 acre covered in 7 mins, uniform droplet distribution'
+      }
+    ];
+
+    const applications = [
+      {
+        id: 'app-1',
+        jobId: 'job-1',
+        labourerName: 'Suresh Patil (Mukaddam)',
+        phone: '9833445566',
+        skills: 'Sugarcane, Wheat, Cotton',
+        experience: 8,
+        isCrewLeader: true,
+        crewSize: 10,
+        district: 'Pune',
+        status: 'ACCEPTED'
+      },
+      {
+        id: 'app-2',
+        jobId: 'job-1',
+        labourerName: 'Ganesh More',
+        phone: '9877889900',
+        skills: 'Tractor Driver, Weeding',
+        experience: 4,
+        isCrewLeader: false,
+        crewSize: 1,
+        district: 'Pune',
+        status: 'PENDING'
+      }
+    ];
+
+    function showTab(tabId) {
+      const tabs = ['home', 'feed', 'farmer-dash', 'post-job', 'applicants', 'my-applications', 'machinery'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        if (el) el.classList.add('hidden');
+      });
+
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.remove('hidden');
+
+      if (tabId === 'feed') renderJobs();
+      if (tabId === 'farmer-dash') renderFarmerDashboard();
+      if (tabId === 'my-applications') renderMyApplications();
+      if (tabId === 'machinery') renderMachinery();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchRole(role) {
+      activeRole = role;
+
+      // Update Desktop Buttons
+      const roles = ['farmer', 'labourer', 'machinery'];
+      roles.forEach(r => {
+        const dBtn = document.getElementById('header-btn-' + r);
+        const mBtn = document.getElementById('m-btn-' + r);
+        if (r === role) {
+          if (dBtn) dBtn.className = 'px-2.5 py-1 rounded-lg font-semibold bg-white text-green-900 shadow-xs transition';
+          if (mBtn) mBtn.className = 'px-2 py-0.5 rounded text-[11px] font-bold bg-white text-green-900';
+        } else {
+          if (dBtn) dBtn.className = 'px-2.5 py-1 rounded-lg font-semibold text-green-100 hover:text-white transition';
+          if (mBtn) mBtn.className = 'px-2 py-0.5 rounded text-[11px] font-bold text-green-100';
+        }
+      });
+
+      // Update Banner Text
+      const indicator = document.getElementById('role-indicator');
+      const actionSlot = document.getElementById('role-nav-action');
+
+      if (role === 'farmer') {
+        indicator.innerHTML = 'User: <b>Anand Shinde</b> • Current Mode: <span class="text-green-400 font-bold">🚜 Farmer (Post Requirements & Hire)</span>';
+        actionSlot.innerHTML = `<button onclick="showTab('post-job')" class="bg-green-800 hover:bg-green-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs">+ Post Job</button>`;
+        showTab('farmer-dash');
+      } else if (role === 'labourer') {
+        indicator.innerHTML = 'User: <b>Anand Shinde</b> • Current Mode: <span class="text-green-400 font-bold">🌾 Labourer (Browse Openings & Apply)</span>';
+        actionSlot.innerHTML = `<button onclick="showTab('my-applications')" class="bg-green-800 hover:bg-green-900 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs">My Applications</button>`;
+        showTab('feed');
+      } else {
+        indicator.innerHTML = 'User: <b>Anand Shinde</b> • Current Mode: <span class="text-amber-400 font-bold">⚙️ Machine Owner (Rent / Offer Equipment)</span>';
+        actionSlot.innerHTML = `<button onclick="openAddMachineModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold shadow-xs">+ List Machine</button>`;
+        showTab('machinery');
+      }
+    }
+
+    // Render Farmer Dashboard
+    function renderFarmerDashboard() {
+      const container = document.getElementById('farmer-jobs-list');
+      container.innerHTML = jobs.map(j => {
+        const appCount = applications.filter(a => a.jobId === j.id).length;
+        const acceptedCount = applications.filter(a => a.jobId === j.id && a.status === 'ACCEPTED').length;
+
+        return `
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${j.activity}</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-700">${j.status}</span>
+                </div>
+                <h3 class="font-bold text-slate-900 text-base mt-1">${j.title}</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Crop: <b>${j.crop}</b> • Daily Wage: <b class="text-green-700">₹${j.wage}/day</b> • Location: <b>${j.district}</b></p>
+              </div>
+
+              <div class="flex items-center space-x-2 w-full sm:w-auto justify-between sm:justify-end">
+                <div class="text-right mr-2">
+                  <span class="text-xs font-semibold text-slate-700">${acceptedCount}/${j.workersNeeded} Hired</span>
+                  <div class="text-[11px] text-green-700">${appCount} Applicants</div>
+                </div>
+                <button onclick="viewApplicants('${j.id}')" class="px-3.5 py-2 bg-green-700 hover:bg-green-800 text-white font-semibold rounded-xl text-xs shadow-xs transition">
+                  Review Applicants (${appCount})
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function viewApplicants(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      document.getElementById('app-job-title').innerText = job.title;
+      renderApplicants(jobId);
+      showTab('applicants');
+    }
+
+    function renderApplicants(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      const apps = applications.filter(a => a.jobId === jobId);
+      const container = document.getElementById('applicants-list');
+
+      if (apps.length === 0) {
+        container.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-slate-500 text-xs border">No applicants have applied yet.</div>`;
+        return;
+      }
+
+      container.innerHTML = apps.map(a => {
+        const isAccepted = a.status === 'ACCEPTED';
+        const masked = isAccepted ? a.phone : a.phone.substring(0, 2) + '******' + a.phone.substring(8);
+
+        return `
+          <div class="p-4 rounded-2xl border ${isAccepted ? 'bg-green-50/70 border-green-300' : 'bg-white border-slate-200'}">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h4 class="font-bold text-slate-900 text-sm">${a.labourerName}</h4>
+                  ${a.isCrewLeader ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full">Crew of ${a.crewSize}</span>` : ''}
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${isAccepted ? 'bg-green-600 text-white' : 'bg-slate-100 text-slate-700'}">${a.status}</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-1">Skills: <b>${a.skills}</b> • Experience: <b>${a.experience} yrs</b> • Location: <b>${a.district}</b></p>
+                <div class="mt-1.5 text-xs">
+                  Phone: <b class="font-mono text-slate-900">${masked}</b>
+                  ${!isAccepted ? '<span class="text-slate-400 text-[10px] ml-2">(Accept candidate to unlock direct phone)</span>' : ''}
+                </div>
+              </div>
+
+              <div class="flex items-center space-x-2">
+                ${!isAccepted ? `
+                  <button onclick="acceptApplicant('${a.id}', '${job.id}')" class="px-3 py-1.5 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl text-xs shadow-xs transition">
+                    Accept Candidate
+                  </button>
+                  <button onclick="rejectApplicant('${a.id}', '${job.id}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl text-xs border transition">
+                    Decline
+                  </button>
+                ` : `
+                  <a href="tel:${a.phone}" class="px-3.5 py-2 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl text-xs flex items-center space-x-1 shadow-xs transition">
+                    <span>📞</span><span>Call Now</span>
+                  </a>
+                  <a href="https://wa.me/91${a.phone}" target="_blank" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center space-x-1 shadow-xs transition">
+                    <span>💬</span><span>WhatsApp</span>
+                  </a>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function acceptApplicant(appId, jobId) {
+      const app = applications.find(a => a.id === appId);
+      if (app) {
+        app.status = 'ACCEPTED';
+        renderApplicants(jobId);
+        alert('✓ Worker accepted! Verified phone number and direct Call/WhatsApp links are now unlocked.');
+      }
+    }
+
+    function rejectApplicant(appId, jobId) {
+      const app = applications.find(a => a.id === appId);
+      if (app) {
+        app.status = 'REJECTED';
+        renderApplicants(jobId);
+      }
+    }
+
+    // Render Labourer Feed
+    function renderJobs() {
+      const district = document.getElementById('feed-district').value;
+      const activity = document.getElementById('feed-activity').value;
+
+      const filtered = jobs.filter(j => {
+        if (district && j.district !== district) return false;
+        if (activity && j.activity !== activity) return false;
+        return true;
+      });
+
+      const container = document.getElementById('job-feed-list');
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-slate-500 text-xs border">No open jobs found matching filters.</div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(j => `
+        <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-green-300 transition">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+            <div>
+              <div class="flex items-center space-x-2">
+                <span class="bg-green-100 text-green-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${j.activity}</span>
+                <span class="text-xs text-slate-500 font-medium">📍 ${j.village}, ${j.district}</span>
+              </div>
+              <h3 class="font-bold text-slate-900 text-base mt-1">${j.title}</h3>
+              <p class="text-xs text-slate-600 mt-0.5">Crop: <b>${j.crop}</b> • Workers Needed: <b>${j.workersNeeded}</b></p>
+              ${j.perks ? `<p class="text-[11px] text-green-700 mt-1">✨ ${j.perks}</p>` : ''}
+            </div>
+
+            <div class="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-slate-100">
+              <div class="text-right">
+                <div class="text-lg font-extrabold text-green-700">₹${j.wage} <span class="text-xs font-normal text-slate-500">/ day</span></div>
+              </div>
+              <button onclick="applyForJob('${j.id}')" class="mt-2 px-4 py-2 bg-green-700 hover:bg-green-800 text-white font-bold rounded-xl text-xs shadow-xs transition">
+                1-Tap Apply
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function applyForJob(jobId) {
+      const job = jobs.find(j => j.id === jobId);
+      const isAlready = applications.some(a => a.jobId === jobId && a.phone === '9822001122');
+      if (isAlready) {
+        alert('You have already applied for this job!');
+        showTab('my-applications');
+        return;
+      }
+
+      applications.push({
+        id: 'app-' + Date.now(),
+        jobId: jobId,
+        labourerName: 'Anand Shinde (Working as Labourer)',
+        phone: '9822001122',
+        skills: 'Harvesting, Tractor Operation',
+        experience: 5,
+        isCrewLeader: false,
+        crewSize: 1,
+        district: 'Pune',
+        status: 'PENDING'
+      });
+
+      alert(`✓ Application submitted to farmer ${job.farmerName}!`);
+      showTab('my-applications');
+    }
+
+    function renderMyApplications() {
+      const container = document.getElementById('my-apps-list');
+      container.innerHTML = applications.map(a => {
+        const job = jobs.find(j => j.id === a.jobId) || jobs[0];
+        const isAccepted = a.status === 'ACCEPTED';
+
+        return `
+          <div class="p-4 rounded-2xl border ${isAccepted ? 'bg-green-50/70 border-green-300' : 'bg-white border-slate-200'}">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div>
+                <div class="flex items-center space-x-2">
+                  <h4 class="font-bold text-slate-900 text-base">${job.title}</h4>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${isAccepted ? 'bg-green-600 text-white' : 'bg-amber-100 text-amber-800'}">${a.status}</span>
+                </div>
+                <p class="text-xs text-slate-600 mt-1">Farmer: <b>${job.farmerName}</b> • Location: <b>${job.district}</b> • Daily Pay: <b class="text-green-700">₹${job.wage}/day</b></p>
+              </div>
+
+              <div>
+                ${isAccepted ? `
+                  <div class="flex space-x-2">
+                    <a href="tel:${job.farmerPhone}" class="px-3.5 py-2 bg-green-700 text-white font-bold rounded-xl text-xs flex items-center space-x-1 shadow-xs">
+                      <span>📞</span><span>Call Farmer (${job.farmerPhone})</span>
+                    </a>
+                  </div>
+                ` : `
+                  <span class="text-xs text-slate-400 italic">Waiting for farmer review...</span>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Render Machinery Hub
+    function renderMachinery() {
+      const district = document.getElementById('machinery-district').value;
+      const type = document.getElementById('machinery-type').value;
+
+      const filtered = machinery.filter(m => {
+        if (district && m.district !== district) return false;
+        if (type && m.type !== type) return false;
+        return true;
+      });
+
+      const container = document.getElementById('machinery-list');
+      container.innerHTML = filtered.map(m => `
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs hover:border-amber-400 transition flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="bg-amber-100 text-amber-900 text-[10px] font-bold px-2 py-0.5 rounded-full">${m.type}</span>
+              <span class="text-xs text-slate-500 font-medium">📍 ${m.village}, ${m.district}</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-base mt-2">${m.title}</h3>
+            <p class="text-xs text-slate-600 mt-1">Owner: <b>${m.ownerName}</b></p>
+            <p class="text-xs text-slate-500 mt-1">${m.specs}</p>
+          </div>
+
+          <div class="pt-4 mt-4 border-t border-slate-100 flex items-center justify-between">
+            <div>
+              <div class="text-base font-extrabold text-amber-800">₹${m.ratePerHour} <span class="text-xs font-normal text-slate-500">/ hr</span></div>
+              <div class="text-[11px] text-slate-500">₹${m.ratePerAcre} / acre</div>
+            </div>
+
+            <div class="flex space-x-2">
+              <a href="tel:${m.phone}" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl text-xs flex items-center space-x-1 shadow-xs transition">
+                <span>📞 Call</span>
+              </a>
+              <a href="https://wa.me/91${m.phone}?text=Hi, I am interested in hiring your ${m.title}." target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs flex items-center space-x-1 shadow-xs transition">
+                <span>💬 WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openAddMachineModal() {
+      const title = prompt('Enter Machine Model (e.g. Swaraj 744 FE 48 HP with Rotavator):', 'John Deere 5050D Tractor with Rotavator');
+      if (!title) return;
+      const hourly = prompt('Enter Hourly Rental Rate (₹/hour):', '850');
+      const acre = prompt('Enter Per-Acre Rate (₹/acre):', '1500');
+
+      machinery.unshift({
+        id: 'm-' + Date.now(),
+        title,
+        type: 'TRACTOR',
+        ownerName: 'Anand Shinde (You)',
+        phone: '9822001122',
+        district: 'Pune',
+        village: 'Baramati',
+        ratePerHour: parseInt(hourly) || 850,
+        ratePerAcre: parseInt(acre) || 1500,
+        specs: 'Offered directly by Anand Shinde under unified account'
+      });
+
+      alert('✓ Your machine has been listed in the Machinery Hub!');
+      showTab('machinery');
+    }
+
+    function handleNewJob(e) {
+      e.preventDefault();
+      const title = document.getElementById('post-title').value;
+      const crop = document.getElementById('post-crop').value;
+      const district = document.getElementById('post-district').value;
+      const activity = document.getElementById('post-activity').value;
+      const workersNeeded = parseInt(document.getElementById('post-workers').value) || 5;
+      const wage = parseInt(document.getElementById('post-wage').value) || 650;
+      const perks = document.getElementById('post-perks').value;
+
+      jobs.unshift({
+        id: 'job-' + Date.now(),
+        title,
+        crop,
+        activity,
+        workersNeeded,
+        wage,
+        district,
+        village: 'Local Farm',
+        farmerName: 'Anand Shinde',
+        farmerPhone: '9822001122',
+        perks,
+        status: 'OPEN'
+      });
+
+      alert('✓ Job requirement published successfully!');
+      showTab('farmer-dash');
+    }
+
+    // Initialize in Farmer mode
+    switchRole('farmer');
+  </script>
+</body>
+</html>

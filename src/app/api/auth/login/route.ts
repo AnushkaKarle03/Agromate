@@ -14,11 +14,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { phone: String(phone) },
+    const cleanPhone = String(phone).replace(/\D/g, '');
+
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { phone: cleanPhone },
+          { phone: String(phone) },
+        ],
+      },
       include: {
         farmerProfile: true,
         labourerProfile: true,
+        machineProfile: true,
       },
     });
 
@@ -37,10 +45,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const profile = user.farmerProfile || user.labourerProfile;
+    const activeRole = user.activeRole || 'FARMER';
+    const profile =
+      activeRole === 'FARMER'
+        ? user.farmerProfile
+        : activeRole === 'LABOURER'
+          ? user.labourerProfile
+          : user.machineProfile || user.farmerProfile || user.labourerProfile;
+
     const token = createToken({
       userId: user.id,
-      role: user.role as any,
+      role: user.role,
+      activeRole,
+      roles: (user.roles || 'FARMER,LABOURER,MACHINE_OWNER').split(','),
       phone: user.phone,
       profileId: profile?.id,
     });
@@ -51,12 +68,17 @@ export async function POST(req: NextRequest) {
       user: {
         id: user.id,
         phone: user.phone,
+        email: user.email,
         role: user.role,
-        profile,
+        activeRole,
+        roles: (user.roles || 'FARMER,LABOURER,MACHINE_OWNER').split(','),
+        farmerProfile: user.farmerProfile,
+        labourerProfile: user.labourerProfile,
+        machineProfile: user.machineProfile,
+        currentProfile: profile,
       },
     });
 
-    // Also set HTTP cookie for browser navigation
     response.cookies.set('agromate_token', token, {
       httpOnly: false,
       path: '/',

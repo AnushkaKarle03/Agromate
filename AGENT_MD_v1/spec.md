@@ -42,15 +42,17 @@ Agromate bridges this information gap by providing an accessible, mobile-first m
 
 Finding agricultural labourers currently relies on personal networks, local contractors, or word-of-mouth communication. This informal system is inefficient, geographically restricted, and unreliable during critical harvest windows, causing crop loss and inflated labour search costs for farmers, while keeping farm labourers vulnerable to underemployment and lack of wage transparency.
 
-### Target Users
+### Target Users & Unified Agricultural Identity
 
-1. **Farmers / Farm Owners**: Individuals or agricultural businesses requiring on-demand or seasonal farm hands. They need a simple interface to post work requirements quickly, view incoming applicants, and initiate direct contact.
-2. **Agricultural Labourers & Crew Leaders (*Mukaddams / Tolis*)**: Farm workers seeking regular daily or seasonal jobs. Many use low-end smartphones or rely on group leaders to negotiate multi-worker jobs. They need easy-to-read listings, location-based filtering, transparent wages, and quick one-tap contact/application.
-3. **Platform Administrators**: Superusers who manage platform health, moderate listings, handle reported disputes, and maintain location hierarchies (states, districts, talukas/tehsils).
+In real-world agricultural communities across Maharashtra, user roles are fluid:
+1. **Farmers / Farm Owners**: Individuals or agricultural businesses requiring on-demand or seasonal farm hands and specialized machinery.
+2. **Agricultural Labourers & Crew Leaders (*Mukaddams / Tolis*)**: Farm workers seeking regular daily or seasonal jobs with transparent pay.
+3. **Machine & Equipment Providers (*Custom Hiring Centers*)**: Tractor, harvester, rotavator, and agricultural drone owners who hire out equipment and operator services to nearby farms.
+4. **Fluid Multi-Role Identity**: A farmer can also work as a labourer in off-seasons, and a machine owner can both farm and offer mechanized services. The platform provides a **single unified account** with instant role switching (`FARMER` ⇄ `LABOURER` ⇄ `MACHINE_OWNER`).
 
-### Current Operational Reality (as of 2026-11-23)
+### Current Operational Reality (as of 2026-11-25)
 
-MVP operational and passing verification. Next.js 14 App Router, TypeScript, Tailwind CSS, Prisma ORM (SQLite for local/test, PostgreSQL supported via docker-compose), and Vitest test suite passing with 100% success rate (10/10 tests). Full feature workflow (auth, job posting, discovery feed, one-tap apply, and direct contact reveal) implemented.
+Unified multi-role platform operational with 18 compiled routes and 100% passing automated test suite (10/10 tests). Single login with real-time active role switching (`POST /api/auth/switch-role`), farmer dashboard, labourer job feed, direct contact unmasking, and agricultural machinery hub (`/machinery/hub`).
 
 ---
 
@@ -82,18 +84,28 @@ MVP operational and passing verification. Next.js 14 App Router, TypeScript, Tai
 
 ## Tech Stack
 
-### Current (what exists today)
+### Official Project Tech Stack (Target Architecture)
 
-| Layer | Technology | Notes |
-|---|---|---|
-| Language | TypeScript (Node.js 20+) | Full-stack type safety |
-| Framework | Next.js 14 (App Router) | Unified SSR & API routes |
-| Frontend | React 18, Tailwind CSS, Lucide Icons | Mobile-first styling |
-| Database | SQLite (`dev.db`) / PostgreSQL (Docker) | Managed via Prisma ORM |
-| Auth | Custom bcrypt + JWT sessions | Role-based authorization |
-| Testing | Vitest | 10 passing unit & integration tests |
-| Containerisation | Docker Compose | Local PostgreSQL container configured |
-| CI/CD | GitHub Actions | Automated lint, typecheck, and test runner |
+| Layer | Technology | Rationale & Why Use It | Status |
+|---|---|---|---|
+| **Frontend** | React 18 / Next.js 14 | Component-based reusability (Job card, Worker card, Applicant card). Next.js provides SEO and server-side rendering. | ✅ Active (`src/app`) |
+| **Styling** | Tailwind CSS | Mobile-first responsive styling optimized for mobile phones (primary device for farmers and labourers). | ✅ Active (`tailwind.config.js`) |
+| **Backend** | Node.js with Next.js Route Handlers / Express | Unified JavaScript/TypeScript stack across frontend and backend. Handles high-concurrency requests (jobs, notifications, applications). | ✅ Active (`src/app/api/`) |
+| **Database** | PostgreSQL + Prisma ORM (with PostGIS support) | Strict relational integrity: Users, Profiles, JobPosts, Applications, Ratings, Payments. Distance-based radius filtering. | ✅ Active (Prisma ORM, SQLite dev / PostgreSQL prod via Docker) |
+| **Authentication** | Node OTP Service (JWT) / Firebase Auth | Phone-number-based credentials for rural users without email. Role-based session tokens (`FARMER`, `LABOURER`). | ✅ Active (JWT + bcrypt phone auth) |
+| **Maps & Location** | OpenStreetMap with Leaflet (or Google Maps API) | Zero-cost mapping on student budget. Displays farm locations, job sites, and worker proximity. | ⏳ Planned (Feature 005) |
+| **Multi-Language** | i18next / next-intl | Native Marathi (मराठी), Hindi (हिंदी), and English support essential for rural user adoption. | ⏳ Planned (Feature 006) |
+| **Payments** | Razorpay (UPI) | Seamless UPI payment for wage advances and security deposits familiar to Indian farmers. | ⏳ Planned (Feature 007) |
+| **Notifications** | Firebase Cloud Messaging (FCM) + SMS (MSG91/Twilio) | Free web push + fallback SMS to reach workers with low internet or feature phones. | ⏳ Planned (Feature 008) |
+| **File Storage** | Cloudinary / AWS S3 | Secure cloud storage for farmer land records, Aadhaar verification, and profile photos. | ⏳ Planned (Feature 009) |
+| **Hosting** | Vercel (Frontend/Edge) + Render/AWS (DB/Backend) | Generous free tiers for college project / pilot MVP, seamless scaling path. | ✅ Configured |
+
+### Key Strategic Architectural Drivers
+
+1. **One Language Everywhere (JS/TS):** Single stack across frontend, backend, and database queries drastically accelerates college project completion.
+2. **Mobile-First & PWA-Ready:** Tailored for low-cost Android smartphones common across rural Maharashtra.
+3. **Low Bandwidth Tolerance:** Lightweight payload design and caching for 2G/3G connectivity in village fields.
+4. **Low Cost / Free Tiers:** Every component chosen has a free tier to respect student project budgets.
 
 ---
 

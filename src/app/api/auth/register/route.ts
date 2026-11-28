@@ -5,22 +5,37 @@ import { hashPassword, createToken } from '@/lib/auth';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { phone, password, role, fullName, district, taluka, village, farmName, primaryCrops, skills, experienceYears, isCrewLeader, crewSize } = body;
+    const {
+      phone,
+      password,
+      fullName,
+      district,
+      taluka,
+      village,
+      primaryRole = 'FARMER',
+      farmName,
+      primaryCrops,
+      skills = 'Harvesting, Weeding',
+      experienceYears = 2,
+      isCrewLeader = false,
+      crewSize = 1,
+      machineTypes = 'Tractor, Rotavator',
+    } = body;
 
-    if (!phone || !password || !role || !fullName || !district) {
+    if (!phone || !password || !fullName || !district) {
       return NextResponse.json(
-        { error: 'Missing required fields: phone, password, role, fullName, district' },
+        { error: 'Missing required fields: phone, password, fullName, district' },
         { status: 400 }
       );
     }
 
-    if (!['FARMER', 'LABOURER', 'ADMIN'].includes(role)) {
-      return NextResponse.json({ error: 'Invalid role specified' }, { status: 400 });
-    }
+    const cleanPhone = String(phone).replace(/\D/g, '');
 
     // Check if phone already registered
-    const existing = await prisma.user.findUnique({
-      where: { phone: String(phone) },
+    const existing = await prisma.user.findFirst({
+      where: {
+        OR: [{ phone: cleanPhone }, { phone: String(phone) }],
+      },
     });
 
     if (existing) {
@@ -31,68 +46,90 @@ export async function POST(req: NextRequest) {
     }
 
     const passwordHash = await hashPassword(password);
+    const activeRole = ['FARMER', 'LABOURER', 'MACHINE_OWNER'].includes(primaryRole)
+      ? primaryRole
+      : 'FARMER';
 
+    // Create user with all 3 role capabilities enabled!
     const user = await prisma.user.create({
       data: {
-        phone: String(phone),
+        phone: cleanPhone,
         passwordHash,
-        role,
-        farmerProfile:
-          role === 'FARMER'
-            ? {
-                create: {
-                  fullName,
-                  farmName: farmName || null,
-                  district,
-                  taluka: taluka || null,
-                  village: village || null,
-                  primaryCrops: primaryCrops || null,
-                },
-              }
-            : undefined,
-        labourerProfile:
-          role === 'LABOURER'
-            ? {
-                create: {
-                  fullName,
-                  skills: skills || 'General Farm Labour',
-                  experienceYears: Number(experienceYears) || 0,
-                  isCrewLeader: Boolean(isCrewLeader),
-                  crewSize: Number(crewSize) || 1,
-                  district,
-                  taluka: taluka || null,
-                  village: village || null,
-                },
-              }
-            : undefined,
+        role: activeRole,
+        roles: 'FARMER,LABOURER,MACHINE_OWNER',
+        activeRole,
+        farmerProfile: {
+          create: {
+            fullName,
+            farmName: farmName || `${fullName}'s Farm`,
+            district,
+            taluka: taluka || null,
+            village: village || null,
+            primaryCrops: primaryCrops || 'Sugarcane, Wheat, Vegetables',
+          },
+        },
+        labourerProfile: {
+          create: {
+            fullName,
+            skills,
+            experienceYears: Number(experienceYears) || 0,
+            isCrewLeader: Boolean(isCrewLeader),
+            crewSize: Number(crewSize) || 1,
+            district,
+            taluka: taluka || null,
+            village: village || null,
+          },
+        },
+        machineProfile: {
+          create: {
+            fullName,
+            machineTypes,
+            district,
+            taluka: taluka || null,
+            village: village || null,
+          },
+        },
       },
       include: {
         farmerProfile: true,
         labourerProfile: true,
+        machineProfile: true,
       },
     });
 
-    const profileId = user.farmerProfile?.id || user.labourerProfile?.id;
     const token = createToken({
       userId: user.id,
-      role: user.role as any,
+      role: user.role,
+      activeRole,
+      roles: ['FARMER', 'LABOURER', 'MACHINE_OWNER'],
       phone: user.phone,
-      profileId,
+      profileId: user.farmerProfile?.id,
     });
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       {
-        message: 'Account successfully registered',
+        message: 'Account successfully registered with multi-role access',
         user: {
           id: user.id,
           phone: user.phone,
-          role: user.role,
-          profile: user.farmerProfile || user.labourerProfile,
+          activeRole,
+          roles: ['FARMER', 'LABOURER', 'MACHINE_OWNER'],
+          farmerProfile: user.farmerProfile,
+          labourerProfile: user.labourerProfile,
+          machineProfile: user.machineProfile,
         },
         token,
       },
       { status: 201 }
     );
+
+    response.cookies.set('agromate_token', token, {
+      httpOnly: false,
+      path: '/',
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
+    return response;
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || 'Registration failed' },

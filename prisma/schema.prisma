@@ -12,11 +12,14 @@ model User {
   phone           String           @unique
   email           String?
   passwordHash    String
-  role            String           @default("LABOURER") // FARMER, LABOURER, ADMIN
+  role            String           @default("FARMER") // Legacy primary role
+  roles           String           @default("FARMER,LABOURER,MACHINE_OWNER") // Enabled multi-roles
+  activeRole      String           @default("FARMER") // Currently active role: FARMER, LABOURER, MACHINE_OWNER
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   farmerProfile   FarmerProfile?
   labourerProfile LabourerProfile?
+  machineProfile  MachineProfile?
 }
 
 model FarmerProfile {
@@ -39,7 +42,7 @@ model LabourerProfile {
   userId          String           @unique
   user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
   fullName        String
-  skills          String           // Comma-separated or JSON: "Harvesting, Weeding, Spraying"
+  skills          String           // "Harvesting, Weeding, Spraying"
   experienceYears Int              @default(0)
   isCrewLeader    Boolean          @default(false)
   crewSize        Int              @default(1)
@@ -49,6 +52,41 @@ model LabourerProfile {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
   applications    JobApplication[]
+}
+
+model MachineProfile {
+  id              String           @id @default(cuid())
+  userId          String           @unique
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName        String
+  machineTypes    String           @default("Tractor, Rotavator")
+  experienceYears Int              @default(2)
+  district        String
+  taluka          String?
+  village         String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  listings        MachineListing[]
+}
+
+model MachineListing {
+  id          String         @id @default(cuid())
+  ownerId     String
+  owner       MachineProfile @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  title       String
+  machineType String         // TRACTOR, HARVESTER, SPRAYER, ROTAVATOR, THRESHER
+  hourlyRate  Int
+  acreRate    Int?
+  district    String
+  taluka      String?
+  village     String?
+  description String?
+  isAvailable Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([district, machineType, isAvailable])
+  @@index([ownerId])
 }
 
 model JobPost {

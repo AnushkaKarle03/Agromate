@@ -116,3 +116,23 @@ Agromate/
 | `tests/` | Quality Assurance | Vitest unit and integration test suites enforcing domain invariant rules. |
 | `prisma/` | Persistence | Declarative database schema, relations, indexes, and migrations. |
 | `AGENT_MD_v1/` | Governance | Traceable specification, plans (`PLAN-000` to `004`), and reports (`REPORT-000` to `004`). |
+
+---
+
+## 3. Technology Stack & Integration Architecture
+
+The following matrix documents the student project / MVP technology stack and how each component integrates into Agromate:
+
+| Layer | Selected Technology | Project Role & Implementation Status |
+|---|---|---|
+| **Frontend** | React 18 + Next.js 14 | Component architecture with pre-rendering. Status: **Implemented** (`src/app/`, `src/components/`). |
+| **Styling** | Tailwind CSS | Mobile-first utility design for rural smartphone users. Status: **Implemented** (`tailwind.config.js`). |
+| **Backend** | Node.js (Next.js Handlers / Express) | Unified full-stack JavaScript/TypeScript runtime. Status: **Implemented** (`src/app/api/`). |
+| **Database** | PostgreSQL + Prisma ORM | Relational schema with PostGIS radius queries. Status: **Active** (Prisma ORM with SQLite local & Docker PostgreSQL). |
+| **Authentication** | JWT + Phone Credentials (OTP Ready) | Mobile-number based role authentication (`FARMER`, `LABOURER`). Status: **Implemented** (`src/lib/auth.ts`). |
+| **Maps & Location** | OpenStreetMap + Leaflet | Zero-cost interactive mapping and distance calculation. Status: **Target Feature (PLAN-005)**. |
+| **Multi-Language** | i18next (Marathi / Hindi / English) | Regional localization essential for Maharashtra farmers. Status: **Target Feature (PLAN-006)**. |
+| **Payments** | Razorpay (UPI) | Indian standard UPI gateway for wage advances. Status: **Target Feature (PLAN-007)**. |
+| **Notifications** | FCM + SMS (Twilio / MSG91) | Dual push & SMS delivery for basic phone compatibility. Status: **Target Feature (PLAN-008)**. |
+| **File Storage** | Cloudinary / AWS S3 | Cloud bucket for land records and ID verification. Status: **Target Feature (PLAN-009)**. |
+| **Hosting** | Vercel + Render / AWS | Zero-cost edge frontend hosting and managed PostgreSQL. Status: **Configured**. |

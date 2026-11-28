@@ -7,7 +7,9 @@ const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'agromate-fallback-secret-key-
 
 export interface TokenPayload {
   userId: string;
-  role: 'FARMER' | 'LABOURER' | 'ADMIN';
+  role: string;
+  activeRole?: string;
+  roles?: string[];
   phone: string;
   profileId?: string;
 }
@@ -55,6 +57,7 @@ export async function getCurrentUser(req: NextRequest) {
     include: {
       farmerProfile: true,
       labourerProfile: true,
+      machineProfile: true,
     },
   });
 
